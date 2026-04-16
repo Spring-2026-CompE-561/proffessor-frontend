@@ -1,9 +1,10 @@
 "use client";
-import { useState } from "react";
+
 import Link from "next/link";
+import { Button } from "./ui/button";
+import { Sheet, SheetContent, SheetTrigger } from "./ui/sheet";
 
 export default function Navbar() {
-	const [isOpen, setIsOpen] = useState(false);
 	return (
 		<nav className="w-full border-b bg-slate-800 text-white ">
 			<div className="mx-auto max-w-7xl px-4">
@@ -30,38 +31,19 @@ export default function Navbar() {
 					</div>
 
 					{/* Mobile Button */}
-					<button
-						onClick={() => setIsOpen(!isOpen)}
-						className="md:hidden text-sm border px-3 py-1 rounded"
-					>
-						Menu
-					</button>
+					<Sheet>
+						<SheetTrigger asChild>
+							<Button>Menu</Button>
+						</SheetTrigger>
+
+						<SheetContent>
+							<Link href="/">Home</Link>
+							<Link href="/about">About</Link>
+							<Link href="/contact">Contact</Link>
+						</SheetContent>
+					</Sheet>
 				</div>
 			</div>
-
-			{/* Mobile Menu */}
-			{isOpen && (
-				<div className="md:hidden px-4 pb-4 space-y-2">
-					<Link
-						href="/"
-						className="block"
-					>
-						Home
-					</Link>
-					<Link
-						href="/about"
-						className="block"
-					>
-						About
-					</Link>
-					<Link
-						href="/contact"
-						className="block"
-					>
-						Contact
-					</Link>
-				</div>
-			)}
 		</nav>
 	);
 }
