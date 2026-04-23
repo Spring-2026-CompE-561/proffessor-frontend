@@ -22,6 +22,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, Controller } from "react-hook-form";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
 	email: z.email("Invalid email address."),
@@ -35,6 +36,7 @@ export function LoginForm({
 	className,
 	...props
 }: React.ComponentProps<"div">) {
+	const router = useRouter();
 	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
 		defaultValues: {
@@ -43,11 +45,34 @@ export function LoginForm({
 		},
 	});
 
-	function onSubmit(data: z.infer<typeof formSchema>) {
-		toast("You submitted the following values:", {
+	async function onSubmit(data: z.infer<typeof formSchema>) {
+		const res = await fetch("http://127.0.0.1:8000/api/v1/user/login", {
+			method: "POST",
+			headers: {
+				Accept: "application/json",
+				"Content-Type": "application/x-www-form-urlencoded",
+			},
+			body: new URLSearchParams({
+				username: data.email,
+				password: data.password,
+			}).toString(),
+		});
+
+		if (!res.ok) {
+			const errorData = await res.json();
+			toast.error("Login failed: " + (errorData?.detail || "Unknown error"));
+			console.error("Login error:", errorData);
+			return;
+		}
+
+		toast("Login successful:", {
 			description: (
 				<pre className="mt-2 w-[320px] overflow-x-auto rounded-md bg-code p-4 text-code-foreground">
-					<code>{JSON.stringify(data, null, 2)}</code>
+					<code>
+						{res.status === 200
+							? "Login successful! \n You can now access your account."
+							: "Unexpected response from server."}
+					</code>
 				</pre>
 			),
 			position: "bottom-right",
@@ -58,6 +83,12 @@ export function LoginForm({
 				"--border-radius": "calc(var(--radius) + 4px)",
 			} as React.CSSProperties,
 		});
+
+		const returnedData = await res.json();
+
+		localStorage.setItem("access_token", returnedData.access_token);
+		router.push("/");
+		return returnedData;
 	}
 
 	return (

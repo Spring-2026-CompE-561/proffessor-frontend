@@ -15,17 +15,22 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/card";
-import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
+import {
+	Field,
+	FieldError,
+	FieldGroup,
+	FieldLabel,
+} from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import { useRouter } from "next/navigation";
 
 const signupSchema = z
 	.object({
-		name: z.string().trim().min(2, "Name must be at least 2 characters."),
 		email: z.email("Invalid email address."),
 		password: z
 			.string()
-			.min(8, "Password must be at least 8 characters.")
+			.min(4, "Password must be at least 4 characters.")
 			.max(32, "Password must be at most 32 characters."),
 		confirmPassword: z.string(),
 	})
@@ -43,18 +48,39 @@ export function SignupForm({
 	const form = useForm<SignupValues>({
 		resolver: zodResolver(signupSchema),
 		defaultValues: {
-			name: "",
 			email: "",
 			password: "",
 			confirmPassword: "",
 		},
 	});
+	const router = useRouter();
 
-	function onSubmit(data: SignupValues) {
+	async function onSubmit(data: SignupValues) {
+		const res = await fetch("http://127.0.0.1:8000/api/v1/user/register", {
+			method: "POST",
+			headers: {
+				Accept: "application/json",
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify(data),
+		});
+
+		if (!res.ok) {
+			const errorData = await res.json();
+			toast.error(
+				"Registration failed: " + (errorData?.detail || "Unknown error"),
+			);
+			return;
+		}
+
 		toast("Your account details are ready:", {
 			description: (
 				<pre className="mt-2 w-[320px] overflow-x-auto rounded-md bg-code p-4 text-code-foreground">
-					<code>{JSON.stringify({ ...data, password: "********", confirmPassword: "********" }, null, 2)}</code>
+					<code>
+						{res.status === 201
+							? "Account created successfully! \n You can now sign in."
+							: "Unexpected response from server."}
+					</code>
 				</pre>
 			),
 			position: "bottom-right",
@@ -65,6 +91,11 @@ export function SignupForm({
 				"--border-radius": "calc(var(--radius) + 4px)",
 			} as React.CSSProperties,
 		});
+
+		const returnedData = await res.json();
+
+		router.push("/signin");
+		return returnedData;
 	}
 
 	return (
@@ -85,25 +116,6 @@ export function SignupForm({
 						onSubmit={form.handleSubmit(onSubmit)}
 					>
 						<FieldGroup>
-							<Controller
-								name="name"
-								control={form.control}
-								render={({ field, fieldState }) => (
-									<Field data-invalid={fieldState.invalid}>
-										<FieldLabel htmlFor="form-signup-name">Full name</FieldLabel>
-										<Input
-											{...field}
-											id="form-signup-name"
-											aria-invalid={fieldState.invalid}
-											placeholder="Taylor Doe"
-											autoComplete="name"
-										/>
-										{fieldState.invalid && (
-											<FieldError errors={[fieldState.error]} />
-										)}
-									</Field>
-								)}
-							/>
 							<Controller
 								name="email"
 								control={form.control}
