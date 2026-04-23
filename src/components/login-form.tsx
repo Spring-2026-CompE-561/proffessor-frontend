@@ -2,6 +2,7 @@
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 import {
 	Card,
 	CardContent,
@@ -12,7 +13,6 @@ import {
 } from "@/components/ui/card";
 import {
 	Field,
-	FieldDescription,
 	FieldError,
 	FieldGroup,
 	FieldLabel,
@@ -55,7 +55,7 @@ export function LoginForm({
 				content: "flex flex-col gap-2",
 			},
 			style: {
-				"--border-radius": "calc(var(--radius)  + 4px)",
+				"--border-radius": "calc(var(--radius) + 4px)",
 			} as React.CSSProperties,
 		});
 	}
@@ -67,9 +67,9 @@ export function LoginForm({
 		>
 			<Card>
 				<CardHeader>
-					<CardTitle>Login to Budget Buddy</CardTitle>
+					<CardTitle>Sign in to Budget Buddy</CardTitle>
 					<CardDescription>
-						Enter your email below to login to your account
+						Use your email and password to access your account.
 					</CardDescription>
 				</CardHeader>
 				<CardContent>
@@ -89,7 +89,7 @@ export function LoginForm({
 											id="form-signin-email"
 											aria-invalid={fieldState.invalid}
 											placeholder="m@example.com"
-											autoComplete="off"
+											autoComplete="email"
 										/>
 										{fieldState.invalid && (
 											<FieldError errors={[fieldState.error]} />
@@ -111,7 +111,7 @@ export function LoginForm({
 											aria-invalid={fieldState.invalid}
 											type="password"
 											placeholder="••••••••"
-											autoComplete="off"
+											autoComplete="current-password"
 										/>
 										{fieldState.invalid && (
 											<FieldError errors={[fieldState.error]} />
@@ -123,21 +123,33 @@ export function LoginForm({
 					</form>
 				</CardContent>
 				<CardFooter>
-					<Field orientation="horizontal">
-						<Button
-							type="button"
-							variant="outline"
-							onClick={() => form.reset()}
-						>
-							Reset
-						</Button>
-						<Button
-							type="submit"
-							form="form-login"
-						>
-							Submit
-						</Button>
-					</Field>
+					<div className="flex w-full flex-col gap-4">
+						<Field orientation="horizontal">
+							<Button
+								type="button"
+								variant="outline"
+								onClick={() => form.reset()}
+							>
+								Reset
+							</Button>
+							<Button
+								type="submit"
+								form="form-login"
+							>
+								Sign in
+							</Button>
+						</Field>
+						<p className="text-sm text-muted-foreground">
+							Need an account?{" "}
+							<Link
+								href="/signup"
+								className="font-medium text-foreground underline underline-offset-4"
+							>
+								Create one
+							</Link>
+							.
+						</p>
+					</div>
 				</CardFooter>
 			</Card>
 		</div>

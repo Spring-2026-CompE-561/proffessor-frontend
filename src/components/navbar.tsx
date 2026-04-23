@@ -49,13 +49,15 @@ function MobileNavbar() {
 					open={isOpen}
 					onOpenChange={setIsOpen}
 				>
-					<SheetTrigger>
-						<Button
-							variant="ghost"
-							size="icon"
-						>
-							<Menu />
-						</Button>
+					<SheetTrigger
+						render={
+							<Button
+								variant="ghost"
+								size="icon"
+							/>
+						}
+					>
+						<Menu />
 					</SheetTrigger>
 					<SheetContent
 						className="w-100 sm:w-135"
@@ -79,7 +81,7 @@ function MobileNavbar() {
 				</div>
 				<div className="flex items-center gap-2">
 					<ModeToggle />
-					<UserButton afterSignOutUrl="/signin" />
+					<UserButton />
 				</div>
 			</nav>
 		</div>
@@ -103,15 +105,19 @@ function DesktopNavbar() {
 					</div>
 				</div>
 				<div className="flex items-center gap-2">
-					<Link href="/signin">
-						<Button variant={"ghost"}>
-							<LogIn />
-						</Button>
+					<Link
+						href="/signin"
+						aria-label="Sign in"
+						className={buttonVariants({ variant: "ghost", size: "icon" })}
+					>
+						<LogIn />
 					</Link>
-					<Link href="/signup">
-						<Button variant={"ghost"}>
-							<UserRoundPlus />
-						</Button>
+					<Link
+						href="/signup"
+						aria-label="Sign up"
+						className={buttonVariants({ variant: "ghost", size: "icon" })}
+					>
+						<UserRoundPlus />
 					</Link>
 
 					<ModeToggle />
