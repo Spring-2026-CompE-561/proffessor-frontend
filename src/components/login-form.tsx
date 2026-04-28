@@ -23,6 +23,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, Controller } from "react-hook-form";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 
 const formSchema = z.object({
 	email: z.email("Invalid email address."),
@@ -37,6 +38,7 @@ export function LoginForm({
 	...props
 }: React.ComponentProps<"div">) {
 	const router = useRouter();
+	const queryClient = useQueryClient();
 	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
 		defaultValues: {
@@ -87,6 +89,11 @@ export function LoginForm({
 		const returnedData = await res.json();
 
 		localStorage.setItem("access_token", returnedData.access_token);
+		/**
+		 * Reset protected query caches so a previous session's error state cannot
+		 * immediately leak into the newly signed-in session.
+		 */
+		queryClient.clear();
 		router.push("/");
 		return returnedData;
 	}
